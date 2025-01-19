@@ -20,24 +20,31 @@ export default function Books({ query }: BooksProps) {
   const utils = api.useContext();
   const saveBook = api.book.save.useMutation({
     onSuccess: () => {
-    
       void utils.book.isSaved.invalidate();
     },
   });
-  const handleSave = async (book: (typeof books)[0]) => {
+  const handleSave = async (book: (typeof books)[number] | undefined) => {
+    if (!book) {
+      console.error("Book is undefined");
+      return;
+    }
+
     setSavingStates((prev) => ({ ...prev, [book.id]: true }));
+
     try {
       await saveBook.mutateAsync({
         bookId: book.id,
         title: book.title,
         authors: book.authors,
-        description: book.description,
-        imageUrl: book.imageUrl,
-        publishedDate: book.publishedDate,
-        pageCount: book.pageCount,
+        description: book.description || "", 
+        imageUrl: book.imageUrl || "",
+        publishedDate: book.publishedDate || "",
+        pageCount: book.pageCount || 0,
         downloadLink: book.downloadLink,
         webReader: book.webReader,
       });
+    } catch (error) {
+      console.error("Error saving book:", error);
     } finally {
       setSavingStates((prev) => ({ ...prev, [book.id]: false }));
     }
