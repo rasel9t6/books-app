@@ -56,4 +56,36 @@ export const bookRouter = createTRPCRouter({
         })) ?? []
       );
     }),
+
+  save: publicProcedure
+    .input(
+      z.object({
+        bookId: z.string(),
+        title: z.string(),
+        authors: z.array(z.string()),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+        publishedDate: z.string().optional(),
+        pageCount: z.number().optional(),
+        downloadLink: z.string().optional(),
+        webReader: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const savedBook = await ctx.db.savedBook.upsert({
+        where: { bookId: input.bookId },
+        update: input,
+        create: input,
+      });
+      return savedBook;
+    }),
+
+  isSaved: publicProcedure
+    .input(z.object({ bookId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const savedBook = await ctx.db.savedBook.findUnique({
+        where: { bookId: input.bookId },
+      });
+      return !!savedBook;
+    }),
 });

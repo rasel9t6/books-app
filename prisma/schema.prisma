@@ -9,13 +9,16 @@ datasource db {
     provider = "sqlite"
     url      = env("DATABASE_URL")
 }
-model Book {
-  id              Int      @id @default(autoincrement())
-  title           String
-  authors          String
-  publicationDate String?
-  description     String?
+model SavedBook {
+  id            String   @id @default(cuid())
+  bookId        String   @unique
+  title         String
+  authors       String   
+  description   String?  
+  imageUrl      String?
+  publishedDate String?
   pageCount     Int?
-  thumbnail        String?
-  createdAt       DateTime @default(now())
+  downloadLink  String?
+  webReader     String?
+  createdAt     DateTime @default(now())
 }
